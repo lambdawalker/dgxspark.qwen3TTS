@@ -1,0 +1,40 @@
+name: Shared TTS API
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.13'
+          enable-cache: true
+      - name: Install CPU contract test dependencies
+        run: |
+          uv venv
+          uv pip sync tests/api/requirements.txt
+      - name: Test adapter and real HTTP/MCP transports
+        run: .venv/bin/python -m pytest tests/api -q
+      - name: Lint and formatting
+        run: |
+          .venv/bin/ruff check qwen_tts_api tests/api examples/api_client.py
+          .venv/bin/ruff format --check qwen_tts_api tests/api examples/api_client.py
+      - name: Check deployment dependency lock
+        run: uv lock --check
+      - name: Build and validate distribution
+        run: |
+          uv build
+          .venv/bin/twine check dist/*
+      - name: Verify integration is packaged
+        run: |
+          .venv/bin/python - <<'PY'
+          import glob, zipfile
+          with zipfile.ZipFile(glob.glob('dist/*.whl')[0]) as wheel:
+              assert 'qwen_tts_api/adapter.py' in wheel.namelist()
+              assert 'qwen_tts_api/cli.py' in wheel.namelist()
+              assert 'qwen_tts/inference/qwen3_tts_model.py' in wheel.namelist()
+          PY

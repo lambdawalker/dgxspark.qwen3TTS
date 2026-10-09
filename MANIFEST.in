@@ -2,8 +2,11 @@ global-exclude *
 
 recursive-include qwen_tts *.py *.pyi py.typed
 recursive-include qwen_tts *.npz
+recursive-include qwen_tts_api *.py
+recursive-include docs *.md
 
 include LICENSE
+include README.md
 include MANIFEST.in
 include pyproject.toml
 

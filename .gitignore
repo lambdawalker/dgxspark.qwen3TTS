@@ -22,3 +22,9 @@ wheels/
 .vscode/
 venv/
 env/
+.venv/
+.venv-api/
+.tts-data/
+api-output/
+.pytest_cache/
+.ruff_cache/

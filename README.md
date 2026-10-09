@@ -1,3 +1,8 @@
+> **DGX Spark shared HTTP/MCP API:** see [setup, capabilities and client examples](docs/api.md).
+> Start with `uv sync --frozen --extra api` and `uv run --frozen --extra api qwen-tts-api`.
+> This fork uses Python 3.13, Torch 2.10/CUDA 13 and SDPA; the upstream examples below
+> describe the original package and may use different installation defaults.
+
 # Qwen3-TTS
 
 <br>

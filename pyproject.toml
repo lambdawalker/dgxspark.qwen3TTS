@@ -29,12 +29,16 @@ dependencies = [
   "einops",
 ]
 
+[project.optional-dependencies]
+api = ["tts-api-server[mcp]==0.1.0"]
+
 [project.urls]
 Homepage = "https://github.com/Qwen/Qwen3-TTS"
 Repository = "https://github.com/Qwen/Qwen3-TTS"
 
 [project.scripts]
 qwen-tts-demo = "qwen_tts.cli.demo:main"
+qwen-tts-api = "qwen_tts_api.cli:main"
 
 [tool.setuptools]
 packages = { find = { where = ["."] , include = ["qwen_tts*"] } }
@@ -49,6 +53,7 @@ environments = ["sys_platform == 'linux' and platform_machine == 'aarch64'"]
 required-environments = ["sys_platform == 'linux' and platform_machine == 'aarch64'"]
 
 [tool.uv.sources]
+tts-api-server = { git = "https://github.com/lambdawalker/python.tts.api.server", rev = "86584426ec0d3c869430e9fcbef2874327437a5c" }
 torch = { index = "pytorch-cu130" }
 torchaudio = { index = "pytorch-cu130" }
 
@@ -57,3 +62,10 @@ name = "pytorch-cu130"
 url = "https://download.pytorch.org/whl/cu130"
 # Keep all other dependencies on PyPI.
 explicit = true
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
