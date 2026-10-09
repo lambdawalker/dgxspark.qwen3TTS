@@ -41,7 +41,8 @@ def run_case(tts: Qwen3TTSModel, out_dir: str, case_name: str, call_fn):
 
 def main():
     device = "cuda:0"
-    MODEL_PATH = "Qwen/Qwen3-TTS-12Hz-1.7B-Base/"
+    # A Hub model ID reuses the standard Hugging Face cache.
+    MODEL_PATH = "Qwen/Qwen3-TTS-12Hz-1.7B-Base"
     OUT_DIR = "qwen3_tts_test_voice_clone_output_wav"
     ensure_dir(OUT_DIR)
 
@@ -49,7 +50,7 @@ def main():
         MODEL_PATH,
         device_map=device,
         dtype=torch.bfloat16,
-        attn_implementation="flash_attention_2",
+        attn_implementation="sdpa",
     )
 
     # Reference audio(s)
