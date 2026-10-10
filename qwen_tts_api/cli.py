@@ -8,6 +8,8 @@ def main(argv=None):
 
     serve(
         [
+            "--host",
+            "0.0.0.0",
             "--adapter",
             "qwen_tts_api.factory:create_adapter",
             *(sys.argv[1:] if argv is None else argv),

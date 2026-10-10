@@ -17,7 +17,8 @@ Run on **Linux ARM64 DGX Spark, Python 3.13, CUDA 13-compatible driver**:
 
 ```bash
 uv sync --frozen --extra api
-uv run --frozen --extra api qwen-tts-api --host 127.0.0.1 --port 8000 --data-dir .tts-data
+export TTS_API_TOKENS='{"replace-with-a-long-random-token":"my-client"}'
+uv run --frozen --extra api qwen-tts-api --port 8000 --data-dir .tts-data
 ```
 
 `uv.lock` pins the deployment, including Torch 2.10.0+cu130 and the shared server's
@@ -32,11 +33,16 @@ its bundled tokenizer. Reserve disk and memory for your enabled checkpoints.
 Discovery does not load weights or require network access with the shipped pins.
 A profile marked `loadable` is not proof of successful GPU inference.
 
-For access from another machine, configure credentials before binding publicly:
+The default bind address is `0.0.0.0` (all IPv4 interfaces). From another machine,
+connect to `http://<spark-lan-ip>:8000`, not `0.0.0.0`. Network binding requires
+`TTS_API_TOKENS`. To restrict access to this machine and optionally run without a
+token, explicitly pass `--host 127.0.0.1`.
+
+To enable MCP as well:
 
 ```bash
 export TTS_API_TOKENS='{"replace-with-a-long-random-token":"my-client"}'
-uv run --frozen --extra api qwen-tts-api --host 0.0.0.0 --port 8000 --mcp --data-dir .tts-data
+uv run --frozen --extra api qwen-tts-api --port 8000 --mcp --data-dir .tts-data
 ```
 
 Use a trusted network or TLS reverse proxy. Clients send `Authorization: Bearer ...`.
@@ -48,7 +54,7 @@ separate application; avoid serving it concurrently on the same GPU without a me
 retention and queue settings. Equivalently:
 
 ```bash
-uv run --frozen --extra api tts-api-server --adapter qwen_tts_api.factory:create_adapter --mcp
+uv run --frozen --extra api tts-api-server --adapter qwen_tts_api.factory:create_adapter --host 0.0.0.0 --mcp
 ```
 
 ## Profiles and controls
@@ -117,7 +123,7 @@ uses three separate jobs; model switching entails unloading/reloading weights.
 Minimal HTTP submission:
 
 ```bash
-curl -H 'Content-Type: application/json' \
+curl -H 'Content-Type: application/json' -H "Authorization: Bearer $TTS_API_KEY" \
   -d '{"text":"Hello!","voice":{"alias":"ryan"},"language":"en"}' \
   http://127.0.0.1:8000/v1/speech
 ```
