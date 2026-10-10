@@ -22,7 +22,7 @@ uv run --frozen --extra api qwen-tts-api --port 8000 --data-dir .tts-data
 ```
 
 `uv.lock` pins the deployment, including Torch 2.10.0+cu130 and shared server
-commit `8a130e6d8153ddc5442865da4a02566d3eb7dac4`. A PyPI release of the shared
+commit `9257bc16e60be92e8418455453c3f00bd6ac0f13`. A PyPI release of the shared
 server is not a prerequisite. Use `uv` so its Git source mapping is honored;
 plain `pip install .[api]` does not apply `[tool.uv.sources]`.
 
@@ -35,7 +35,7 @@ A profile marked `loadable` is not proof of successful GPU inference.
 
 The default bind address is `0.0.0.0` (all IPv4 interfaces). From another machine,
 connect to `http://<spark-lan-ip>:8000`, not `0.0.0.0`. Network binding requires
-`TTS_API_TOKENS` unless you explicitly pass `--no-auth`. To restrict access to this
+`TTS_API_TOKENS` unless you explicitly pass `--anonymous-sessions` or `--no-auth`. To restrict access to this
 machine and optionally run without a token, explicitly pass `--host 127.0.0.1`.
 
 To enable MCP as well:
@@ -111,7 +111,7 @@ Start the server as above, then from this checkout on a client machine:
 
 ```bash
 export TTS_API_KEY='replace-with-the-server-token' # omit for local unauthenticated mode
-uv run --no-project --with 'git+https://github.com/lambdawalker/python.tts.api.client@2b9188940eb3d763ab7aeff100cc9af1a0d2a66b' python examples/api_client.py --url http://127.0.0.1:8000
+uv run --no-project --with 'git+https://github.com/lambdawalker/python.tts.api.client@f82cd3e2546e58eb419a9e0e8a79ab398fc6a24b' python examples/api_client.py --url http://127.0.0.1:8000
 ```
 
 The example writes `api-output/custom.wav`, `design.wav`, and `clone.wav`. It tests
@@ -191,3 +191,50 @@ overrides `TTS_API_TOKENS` even when it is set. All clients share the `local` ca
 including its jobs, voices and assets. Anyone who can reach the port can access
 these resources; this flag does not impose a private-network IP restriction.
 Remove `--no-auth` to restore the normal token requirement for network binding.
+
+
+## Anonymous sessions with private jobs
+
+Anyone who can reach the server can create a session without a preconfigured API key:
+
+```bash
+unset TTS_API_TOKENS
+uv run --frozen --extra api qwen-tts-api --anonymous-sessions --mcp
+```
+
+This mode keeps each session's jobs, uploaded assets and registered voices separate.
+It is mutually exclusive with `--no-auth` and static `TTS_API_TOKENS`. The server
+still binds to `0.0.0.0`; connect using the Spark's LAN IP.
+
+```python
+from tts_api_client import TTSClient
+
+with TTSClient("http://<spark-lan-ip>:8000", anonymous_session=True) as client:
+    session = client.create_session()
+    # Keep session.access_token private if you need to reconnect later.
+    job = client.generate_speech(text="Hello!", voice={"alias": "ryan"})
+    result = job.wait(timeout=1800)
+
+with TTSClient("http://<spark-lan-ip>:8000", session_token=session.access_token) as client:
+    print(client.get_job(job.id).status)
+    # client.revoke_session() explicitly ends access; close() does not.
+```
+
+Without explicit `create_session()`, the first operation creates one automatically.
+The async client supports the same options. To run the full hardware example,
+unset `TTS_API_KEY` and pass `--anonymous-session`; set `TTS_SESSION_TOKEN` to
+resume a saved session instead. Tokens are never printed by the example.
+
+Raw HTTP clients first call `POST /v1/sessions`, then send the returned
+`access_token` as `Authorization: Bearer ...` for all other endpoints, including
+MCP, job events and audio downloads. `DELETE /v1/sessions/current` revokes it.
+Tokens expire after 24 hours by default (`--session-ttl` seconds); at most 10,000
+active sessions are allowed (`--max-sessions`). Sessions survive server restarts.
+There is no automatic renewal or recovery for lost/expired tokens. Expiration or
+revocation closes job-event streams but does not cancel jobs or delete resources.
+
+This is session ownership, not user identity: anyone holding a token has its access,
+and anyone reaching the port can create a new session and submit work. Use HTTPS
+when the network is not trusted. See the
+[session contract](https://github.com/lambdawalker/design.ai/blob/main/tts/sessions.md)
+for lifecycle, capacity and retention semantics.

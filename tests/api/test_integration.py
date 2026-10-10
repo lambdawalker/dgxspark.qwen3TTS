@@ -205,3 +205,34 @@ def test_cancel_during_native_call_discards_audio(tmp_path, live_server):
             assert time.monotonic() < deadline
             time.sleep(0.01)
         assert state.status == "cancelled" and not state.results
+
+
+def test_anonymous_sessions_isolate_qwen_jobs(tmp_path, live_server):
+    from tts_api_client import APIError
+
+    profile = "qwen3-tts-1.7b-customvoice"
+    adapter = QwenAdapter(
+        {profile: "a" * 40}, loader=lambda s, r: NativeModel(s), releaser=lambda: None
+    )
+    app = create_app([adapter], Settings(data_dir=tmp_path, anonymous_sessions=True))
+    with (
+        live_server(app) as url,
+        TTSClient(url, anonymous_session=True) as alice,
+        TTSClient(url, anonymous_session=True) as bob,
+    ):
+        job = alice.generate_speech(text="Hello", voice={"alias": "ryan"})
+        done = job.wait(timeout=5, poll_interval=0.01)
+        assert done.status == "succeeded"
+        with pytest.raises(APIError) as denied:
+            bob.get_job(job.id)
+        assert denied.value.status_code == 404
+        with pytest.raises(APIError):
+            bob.download_asset(done.results[0].asset_id, tmp_path / "denied.wav")
+        with TTSClient(url, session_token=alice.session_token) as resumed:
+            assert resumed.get_job(job.id).status == "succeeded"
+            output = resumed.download_asset(done.results[0].asset_id, tmp_path / "own.wav")
+            assert sf.info(output).samplerate == 24000
+            resumed.revoke_session()
+        with pytest.raises(APIError) as revoked:
+            alice.get_job(job.id)
+        assert revoked.value.status_code == 401
