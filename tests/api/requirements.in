@@ -1,5 +1,5 @@
 # CPU integration checks intentionally omit this fork's ARM64 CUDA dependencies.
-tts-api-server[mcp] @ git+https://github.com/lambdawalker/python.tts.api.server@86584426ec0d3c869430e9fcbef2874327437a5c
+tts-api-server[mcp] @ git+https://github.com/lambdawalker/python.tts.api.server@8a130e6d8153ddc5442865da4a02566d3eb7dac4
 tts-api-client @ git+https://github.com/lambdawalker/python.tts.api.client@2b9188940eb3d763ab7aeff100cc9af1a0d2a66b
 numpy
 pytest>=8,<9

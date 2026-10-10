@@ -1042,7 +1042,7 @@ requires-dist = [
     { name = "torch", specifier = "==2.10.0+cu130", index = "https://download.pytorch.org/whl/cu130" },
     { name = "torchaudio", specifier = "==2.10.0+cu130", index = "https://download.pytorch.org/whl/cu130" },
     { name = "transformers", specifier = "==4.57.3" },
-    { name = "tts-api-server", extras = ["mcp"], marker = "extra == 'api'", git = "https://github.com/lambdawalker/python.tts.api.server?rev=86584426ec0d3c869430e9fcbef2874327437a5c" },
+    { name = "tts-api-server", extras = ["mcp"], marker = "extra == 'api'", git = "https://github.com/lambdawalker/python.tts.api.server?rev=8a130e6d8153ddc5442865da4a02566d3eb7dac4" },
 ]
 provides-extras = ["api"]
 
@@ -1388,7 +1388,7 @@ wheels = [
 [[package]]
 name = "tts-api-server"
 version = "0.1.0"
-source = { git = "https://github.com/lambdawalker/python.tts.api.server?rev=86584426ec0d3c869430e9fcbef2874327437a5c#86584426ec0d3c869430e9fcbef2874327437a5c" }
+source = { git = "https://github.com/lambdawalker/python.tts.api.server?rev=8a130e6d8153ddc5442865da4a02566d3eb7dac4#8a130e6d8153ddc5442865da4a02566d3eb7dac4" }
 dependencies = [
     { name = "fastapi" },
     { name = "filelock" },

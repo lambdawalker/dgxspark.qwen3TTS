@@ -21,8 +21,8 @@ export TTS_API_TOKENS='{"replace-with-a-long-random-token":"my-client"}'
 uv run --frozen --extra api qwen-tts-api --port 8000 --data-dir .tts-data
 ```
 
-`uv.lock` pins the deployment, including Torch 2.10.0+cu130 and the shared server's
-merged commit `86584426ec0d3c869430e9fcbef2874327437a5c`. A PyPI release of the shared
+`uv.lock` pins the deployment, including Torch 2.10.0+cu130 and shared server
+commit `8a130e6d8153ddc5442865da4a02566d3eb7dac4`. A PyPI release of the shared
 server is not a prerequisite. Use `uv` so its Git source mapping is honored;
 plain `pip install .[api]` does not apply `[tool.uv.sources]`.
 
@@ -35,8 +35,8 @@ A profile marked `loadable` is not proof of successful GPU inference.
 
 The default bind address is `0.0.0.0` (all IPv4 interfaces). From another machine,
 connect to `http://<spark-lan-ip>:8000`, not `0.0.0.0`. Network binding requires
-`TTS_API_TOKENS`. To restrict access to this machine and optionally run without a
-token, explicitly pass `--host 127.0.0.1`.
+`TTS_API_TOKENS` unless you explicitly pass `--no-auth`. To restrict access to this
+machine and optionally run without a token, explicitly pass `--host 127.0.0.1`.
 
 To enable MCP as well:
 
@@ -176,3 +176,18 @@ Tests use a native model double returning silence; they verify mappings, validat
 audio encoding, the existing Python client over HTTP, MCP, profile switching and
 cancellation. **They do not validate DGX Spark/CUDA execution or acoustic quality.**
 Run the hardware example on the target before claiming deployment readiness.
+
+## Token-free LAN mode
+
+To let clients call the API without a token:
+
+```bash
+uv run --frozen --extra api qwen-tts-api --no-auth --mcp
+```
+
+The default host is `0.0.0.0`. Connect to `http://<spark-lan-ip>:8000`; omit `api_key`
+in the Python client or the Authorization header in HTTP requests. `--no-auth`
+overrides `TTS_API_TOKENS` even when it is set. All clients share the `local` caller,
+including its jobs, voices and assets. Anyone who can reach the port can access
+these resources; this flag does not impose a private-network IP restriction.
+Remove `--no-auth` to restore the normal token requirement for network binding.

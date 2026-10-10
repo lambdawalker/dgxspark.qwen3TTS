@@ -1,7 +1,7 @@
 > **DGX Spark shared HTTP/MCP API:** see [setup, capabilities and client examples](docs/api.md).
 > Start with `uv sync --frozen --extra api` and `uv run --frozen --extra api qwen-tts-api`.
 > The API binds to `0.0.0.0` by default; configure `TTS_API_TOKENS` as shown in the guide.
-> Use `--host 127.0.0.1` for local-only access.
+> Use `--no-auth` for token-free LAN access, or `--host 127.0.0.1` for local-only access.
 > This fork uses Python 3.13, Torch 2.10/CUDA 13 and SDPA; the upstream examples below
 > describe the original package and may use different installation defaults.
 

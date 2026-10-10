@@ -53,7 +53,7 @@ environments = ["sys_platform == 'linux' and platform_machine == 'aarch64'"]
 required-environments = ["sys_platform == 'linux' and platform_machine == 'aarch64'"]
 
 [tool.uv.sources]
-tts-api-server = { git = "https://github.com/lambdawalker/python.tts.api.server", rev = "86584426ec0d3c869430e9fcbef2874327437a5c" }
+tts-api-server = { git = "https://github.com/lambdawalker/python.tts.api.server", rev = "8a130e6d8153ddc5442865da4a02566d3eb7dac4" }
 torch = { index = "pytorch-cu130" }
 torchaudio = { index = "pytorch-cu130" }
 

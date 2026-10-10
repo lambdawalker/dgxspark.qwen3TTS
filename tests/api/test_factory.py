@@ -86,3 +86,22 @@ def test_cli_default_host_and_override(monkeypatch, host_args, expected):
         parsed[0], {"TTS_API_TOKENS": '{"test-token":"caller"}'}
     )
     assert settings.tokens == {"test-token": "caller"}
+
+
+def test_cli_passes_explicit_no_auth(monkeypatch):
+    import tts_api_server.cli
+
+    from qwen_tts_api.cli import main
+
+    settings = []
+
+    def capture(argv):
+        args = tts_api_server.cli.build_parser().parse_args(argv)
+        assert args.host == "0.0.0.0" and args.no_auth
+        settings.append(
+            tts_api_server.cli.settings_from_args(args, {"TTS_API_TOKENS": '{"secret":"alice"}'})
+        )
+
+    monkeypatch.setattr(tts_api_server.cli, "main", capture)
+    main(["--no-auth", "--mcp"])
+    assert settings[0].tokens == {}
