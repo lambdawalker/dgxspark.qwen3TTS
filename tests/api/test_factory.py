@@ -51,5 +51,38 @@ def test_cli_delegates_shared_auth_and_options(monkeypatch):
     monkeypatch.setattr(tts_api_server.cli, "main", calls.append)
     main(["--port", "8123", "--mcp"])
     assert calls == [
-        ["--adapter", "qwen_tts_api.factory:create_adapter", "--port", "8123", "--mcp"]
+        [
+            "--host",
+            "0.0.0.0",
+            "--adapter",
+            "qwen_tts_api.factory:create_adapter",
+            "--port",
+            "8123",
+            "--mcp",
+        ]
     ]
+
+
+@pytest.mark.parametrize(
+    "host_args, expected", [([], "0.0.0.0"), (["--host", "127.0.0.1"], "127.0.0.1")]
+)
+def test_cli_default_host_and_override(monkeypatch, host_args, expected):
+    import tts_api_server.cli
+
+    from qwen_tts_api.cli import main
+
+    parsed = []
+    monkeypatch.setattr(
+        tts_api_server.cli,
+        "main",
+        lambda argv: parsed.append(tts_api_server.cli.build_parser().parse_args(argv)),
+    )
+    main(host_args)
+    assert parsed[0].host == expected
+    if expected == "0.0.0.0":
+        with pytest.raises(ValueError, match="TTS_API_TOKENS"):
+            tts_api_server.cli.settings_from_args(parsed[0], {})
+    settings = tts_api_server.cli.settings_from_args(
+        parsed[0], {"TTS_API_TOKENS": '{"test-token":"caller"}'}
+    )
+    assert settings.tokens == {"test-token": "caller"}
