@@ -168,7 +168,7 @@ starlette==1.7.0
     #   sse-starlette
 tts-api-client @ git+https://github.com/lambdawalker/python.tts.api.client@2b9188940eb3d763ab7aeff100cc9af1a0d2a66b
     # via -r tests/api/requirements.in
-tts-api-server @ git+https://github.com/lambdawalker/python.tts.api.server@86584426ec0d3c869430e9fcbef2874327437a5c
+tts-api-server @ git+https://github.com/lambdawalker/python.tts.api.server@8a130e6d8153ddc5442865da4a02566d3eb7dac4
     # via -r tests/api/requirements.in
 twine==7.0.0
     # via -r tests/api/requirements.in
