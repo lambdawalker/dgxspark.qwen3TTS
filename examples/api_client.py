@@ -13,9 +13,15 @@ def main():
     )
     parser.add_argument("--url", default="http://127.0.0.1:8000")
     parser.add_argument("--output-dir", type=Path, default=Path("api-output"))
+    parser.add_argument("--anonymous-session", action="store_true")
     args = parser.parse_args()
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    with TTSClient(args.url, api_key=os.environ.get("TTS_API_KEY")) as client:
+    with TTSClient(
+        args.url,
+        api_key=os.environ.get("TTS_API_KEY"),
+        anonymous_session=args.anonymous_session,
+        session_token=os.environ.get("TTS_SESSION_TOKEN"),
+    ) as client:
 
         def save(job, filename):
             result = job.wait(timeout=1800, poll_interval=1)

@@ -105,3 +105,19 @@ def test_cli_passes_explicit_no_auth(monkeypatch):
     monkeypatch.setattr(tts_api_server.cli, "main", capture)
     main(["--no-auth", "--mcp"])
     assert settings[0].tokens == {}
+
+
+def test_cli_passes_anonymous_sessions(monkeypatch):
+    import tts_api_server.cli
+
+    from qwen_tts_api.cli import main
+
+    def capture(argv):
+        args = tts_api_server.cli.build_parser().parse_args(argv)
+        assert args.host == "0.0.0.0" and args.anonymous_sessions
+        settings = tts_api_server.cli.settings_from_args(args, {})
+        assert settings.anonymous_sessions and settings.tokens == {}
+        assert settings.session_ttl == 3600
+
+    monkeypatch.setattr(tts_api_server.cli, "main", capture)
+    main(["--anonymous-sessions", "--session-ttl", "3600", "--mcp"])
