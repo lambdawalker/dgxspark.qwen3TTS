@@ -45,9 +45,7 @@ def launcher(tmp_path):
 def test_launcher_syncs_existing_environment_on_every_launch(launcher):
     root, log, env = launcher
     for _ in range(2):
-        subprocess.run(
-            ["sh", str(root / "start.sh")], env=env, check=True, capture_output=True
-        )
+        subprocess.run(["sh", str(root / "start.sh")], env=env, check=True, capture_output=True)
     lines = log.read_text().splitlines()
     assert len(lines) == 4
     for offset in (0, 2):

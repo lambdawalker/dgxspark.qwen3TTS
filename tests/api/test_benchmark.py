@@ -18,9 +18,7 @@ ROOT = Path(__file__).resolve().parents[2]
 class BenchmarkAdapter(FakeAdapter):
     def profiles(self):
         profile = super().profiles()[0]
-        profile.voices = [
-            Voice(id="ryan", model=profile.id, alias="ryan", kind="builtin")
-        ]
+        profile.voices = [Voice(id="ryan", model=profile.id, alias="ryan", kind="builtin")]
         return [profile]
 
 
@@ -38,14 +36,22 @@ def test_benchmark_cli_auth_and_audio_download(mode, tmp_path, live_server):
         command = [
             sys.executable,
             str(ROOT / "tools/benchmark_qwen_tts.py"),
-            "--url", url,
-            "--model", "fake-v1",
-            "--warmup", "0",
-            "--runs", "1",
-            "--poll-interval", "0.01",
-            "--timeout", "5",
-            "--save-dir", str(audio),
-            "--output", str(output),
+            "--url",
+            url,
+            "--model",
+            "fake-v1",
+            "--warmup",
+            "0",
+            "--runs",
+            "1",
+            "--poll-interval",
+            "0.01",
+            "--timeout",
+            "5",
+            "--save-dir",
+            str(audio),
+            "--output",
+            str(output),
         ]
         if mode == "token":
             command += ["--api-key", "secret"]
@@ -75,10 +81,14 @@ def test_benchmark_requires_key_on_static_token_server(tmp_path, live_server):
             [
                 sys.executable,
                 str(ROOT / "tools/benchmark_qwen_tts.py"),
-                "--url", url,
-                "--warmup", "0",
-                "--runs", "1",
-                "--timeout", "5",
+                "--url",
+                url,
+                "--warmup",
+                "0",
+                "--runs",
+                "1",
+                "--timeout",
+                "5",
             ],
             capture_output=True,
             text=True,

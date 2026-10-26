@@ -17,12 +17,14 @@ jobs:
         run: |
           uv venv
           uv pip sync tests/api/requirements.txt
+      - name: Check launcher and build script syntax
+        run: sh -n start.sh scripts/build_flash_attn.sh
       - name: Test adapter and real HTTP/MCP transports
         run: .venv/bin/python -m pytest tests/api -q
       - name: Lint and formatting
         run: |
-          .venv/bin/ruff check qwen_tts_api tests/api examples/api_client.py
-          .venv/bin/ruff format --check qwen_tts_api tests/api examples/api_client.py
+          .venv/bin/ruff check qwen_tts_api tests/api examples/api_client.py tools/benchmark_qwen_tts.py
+          .venv/bin/ruff format --check qwen_tts_api tests/api examples/api_client.py tools/benchmark_qwen_tts.py
       - name: Check deployment dependency lock
         run: uv lock --check
       - name: Build and validate distribution

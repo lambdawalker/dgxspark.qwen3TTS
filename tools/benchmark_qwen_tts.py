@@ -44,6 +44,27 @@ def request_json(url: str, payload: dict | None, api_key: str | None, timeout: f
         return json.load(response)
 
 
+def resolve_api_key(base: str, api_key: str | None, timeout: float) -> str | None:
+    """Reuse supplied credentials or bootstrap the default anonymous session."""
+    if api_key:
+        return api_key
+    try:
+        request_json(base + "/v1/models", None, None, timeout)
+        return None
+    except urllib.error.HTTPError as error:
+        error.close()
+        if error.code != 401:
+            raise
+    try:
+        session = request_json(base + "/v1/sessions", {}, None, timeout)
+    except urllib.error.HTTPError as error:
+        error.close()
+        if error.code == 401:
+            raise RuntimeError("This server requires a bearer token; supply --api-key.") from error
+        raise
+    return session["access_token"]
+
+
 def wav_duration(data: bytes) -> float:
     with wave.open(io.BytesIO(data)) as wav:
         return wav.getnframes() / wav.getframerate()
@@ -59,9 +80,7 @@ def run_once(base: str, text: str, args) -> dict:
     if args.instructions:
         payload["instructions"] = args.instructions
     if args.greedy:
-        payload["extensions"] = {
-            "qwen": {"do_sample": False, "subtalker_dosample": False}
-        }
+        payload["extensions"] = {"qwen": {"do_sample": False, "subtalker_dosample": False}}
     started = time.perf_counter()
     job = request_json(base + "/v1/speech", payload, args.api_key, args.timeout)
     while True:
@@ -80,9 +99,9 @@ def run_once(base: str, text: str, args) -> dict:
         directory = Path(args.save_dir)
         directory.mkdir(parents=True, exist_ok=True)
         path = directory / f"{args.label}-{args.case_name}-{args.run_index}.wav"
-        with urllib.request.urlopen(
-            base + "/v1/assets/" + result["asset_id"], timeout=args.timeout
-        ) as response:
+        headers = {"Authorization": f"Bearer {args.api_key}"} if args.api_key else {}
+        request = urllib.request.Request(base + "/v1/assets/" + result["asset_id"], headers=headers)
+        with urllib.request.urlopen(request, timeout=args.timeout) as response:
             audio = response.read()
         path.write_bytes(audio)
     duration = result["duration"]
@@ -121,7 +140,11 @@ def main() -> None:
         action="store_true",
         help="Disable sampling for a deterministic attention comparison.",
     )
-    parser.add_argument("--api-key", default=None)
+    parser.add_argument(
+        "--api-key",
+        default=None,
+        help="Bearer token. Without one, use no-auth access or create an anonymous session.",
+    )
     parser.add_argument("--runs", type=int, default=3)
     parser.add_argument("--warmup", type=int, default=1)
     parser.add_argument("--poll-interval", type=float, default=0.25)
@@ -131,11 +154,14 @@ def main() -> None:
     parser.add_argument("--output", default="qwen-benchmark.json")
     args = parser.parse_args()
     base = args.url.rstrip("/")
+    args.api_key = resolve_api_key(base, args.api_key, args.timeout)
 
     for _ in range(args.warmup):
-        run_once(base, "Warm up.", args.__class__(
-            **{**vars(args), "case_name": "warmup", "run_index": 0}
-        ))
+        run_once(
+            base,
+            "Warm up.",
+            args.__class__(**{**vars(args), "case_name": "warmup", "run_index": 0}),
+        )
 
     cases = []
     for case_name, text in DEFAULT_TEXTS.items():

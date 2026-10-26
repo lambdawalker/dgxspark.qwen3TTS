@@ -15,10 +15,10 @@ if [ "$(uname -m)" != "aarch64" ]; then
 fi
 
 PY="$ROOT/.venv/bin/python"
-if [ ! -x "$PY" ] || ! "$PY" -c 'import tts_api_server' >/dev/null 2>&1; then
-    echo "Creating the locked Qwen TTS API environment..."
-    uv sync --frozen --extra api
-fi
+# Reconcile locked dependencies on every start, including after git pull.
+# Keep extra packages such as the locally built FlashAttention wheel.
+echo "Synchronizing the locked Qwen TTS API environment..."
+uv sync --frozen --extra api --inexact
 
 if [ "${QWEN_TTS_ATTENTION:-sdpa}" = "flash_attention_2" ]; then
     if ! "$PY" -c 'import flash_attn' >/dev/null 2>&1; then

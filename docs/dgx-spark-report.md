@@ -63,7 +63,9 @@ The default remains **SDPA**, which is in `uv.lock` and needs no local build.
 Benchmarks submitted one job at a time to the HTTP API. Each case used the
 1.7B CustomVoice profile, `ryan`, English, the default native sampling settings,
 and three runs after one warmup. Wall time is from job submission until the job
-reports `succeeded`; audio duration is the returned result duration. RTF is wall
+reports `succeeded`; authentication/session setup is outside the measured
+interval. The benchmark supports anonymous sessions, static bearer tokens via
+`--api-key`, and token-free servers. Audio duration is the returned result duration. RTF is wall
 time divided by audio duration (lower is better; below 1 is faster than real
 time).
 

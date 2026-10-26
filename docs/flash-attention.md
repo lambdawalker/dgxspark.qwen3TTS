@@ -40,7 +40,9 @@ uv pip install --python .venv/bin/python --no-deps wheels/flash_attn-*.whl
 
 Do not run a plain `uv sync` after installing the wheel: the wheel is not in
 `uv.lock`, so uv removes it. Use `./start.sh`, or reinstall the wheel after a
-sync. The default remains SDPA, which is in the lock and needs no local build.
+sync. The launcher synchronizes locked dependencies on every start using
+`uv sync --frozen --extra api --inexact`, which preserves the extra wheel.
+The default remains SDPA, which is in the lock and needs no local build.
 
 ## Select it
 

@@ -24,7 +24,7 @@ cd /home/spark/opt/TTS/dgxspark.qwen3TTS
 ./start.sh
 ```
 
-`start.sh` creates the locked `.venv` if needed and starts the HTTP API and MCP
+`start.sh` synchronizes the locked `.venv` on every launch and starts the HTTP API and MCP
 server on `0.0.0.0:8000` using `.tts-data`. By default it uses
 `--anonymous-sessions --mcp`, so callers can create isolated sessions without a
 preconfigured token. MCP clients must send the session bearer token; for a
@@ -34,9 +34,11 @@ the port to everyone who can reach it).
 OpenAPI/discovery:
 
 ```bash
-curl http://127.0.0.1:8000/v1/models
-# Anonymous mode: create a session, then send its access_token to /mcp.
-curl -X POST http://127.0.0.1:8000/v1/sessions -H 'Content-Type: application/json' -d '{}'
+# Anonymous mode: create a session, then use its token for HTTP and MCP.
+TOKEN=$(curl --fail -sS -X POST http://127.0.0.1:8000/v1/sessions \
+  -H 'Content-Type: application/json' -d '{}' \
+  | .venv/bin/python -c 'import json, sys; print(json.load(sys.stdin)["access_token"])')
+curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:8000/v1/models
 ```
 
 The MCP endpoint is `http://127.0.0.1:8000/mcp`. It exposes `list_models`,
@@ -102,8 +104,10 @@ kernel runs, but it is a compatibility target rather than a GB10 optimization.
 Use SDPA unless you have a workload that specifically benefits from FA2.
 
 Do not run a plain `uv sync` after installing the local wheel: it is not in
-`uv.lock`, so uv removes it. `start.sh` keeps the existing environment and
-installs the wheel on demand when the FA2 runtime is selected.
+`uv.lock`, so uv removes it. `start.sh` uses
+`uv sync --frozen --extra api --inexact` on every launch to update locked
+dependencies while preserving extra packages, including the local FA2 wheel.
+It installs the wheel on demand when the FA2 runtime is selected.
 
 ## API / MCP
 
@@ -112,13 +116,20 @@ idempotency, SSE and session behavior are in [the API guide](api.md). A minimal
 HTTP request:
 
 ```bash
-curl -H 'Content-Type: application/json' \
+# Use TOKEN from the anonymous session above, or your configured bearer token.
+curl -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
   -d '{"text":"Hello from the Spark.","voice":{"alias":"ryan"},"language":"en"}' \
   http://127.0.0.1:8000/v1/speech
 ```
 
 The response is a queued job. Poll `status_url`, then download the result's
-`asset_id` from `/v1/assets/{id}`. MCP clients use the same jobs and assets.
+`asset_id` from `/v1/assets/{id}`, using the same bearer token for each request.
+MCP clients use the same jobs and assets.
+
+The benchmark automatically creates one anonymous session when required and
+reuses its token for all jobs and audio downloads. For a server configured with
+static tokens, pass `--api-key TOKEN`. Token-free servers also work without
+additional flags. Session setup happens before measured generation.
 
 ## Notes and limits
 
