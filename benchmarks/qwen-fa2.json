@@ -1,0 +1,149 @@
+{
+  "timestamp": "2026-10-26T13:29:46.042022+00:00",
+  "url": "http://127.0.0.1:8002",
+  "model": "qwen3-tts-1.7b-customvoice",
+  "voice": "ryan",
+  "cases": [
+    {
+      "case": "short",
+      "chars": 25,
+      "samples": [
+        {
+          "wall_s": 1.795,
+          "audio_s": 2.0,
+          "rtf": 0.897,
+          "bytes": 96044,
+          "path": null,
+          "status": "succeeded"
+        },
+        {
+          "wall_s": 1.796,
+          "audio_s": 2.08,
+          "rtf": 0.863,
+          "bytes": 99884,
+          "path": null,
+          "status": "succeeded"
+        },
+        {
+          "wall_s": 2.04,
+          "audio_s": 2.24,
+          "rtf": 0.911,
+          "bytes": 107564,
+          "path": null,
+          "status": "succeeded"
+        }
+      ],
+      "summary": {
+        "wall_s": {
+          "median": 1.796,
+          "min": 1.795,
+          "max": 2.04
+        },
+        "audio_s": {
+          "median": 2.08,
+          "min": 2.0,
+          "max": 2.24
+        },
+        "rtf": {
+          "median": 0.897,
+          "min": 0.863,
+          "max": 0.911
+        }
+      }
+    },
+    {
+      "case": "medium",
+      "chars": 128,
+      "samples": [
+        {
+          "wall_s": 8.106,
+          "audio_s": 10.08,
+          "rtf": 0.804,
+          "bytes": 483884,
+          "path": null,
+          "status": "succeeded"
+        },
+        {
+          "wall_s": 6.832,
+          "audio_s": 8.4,
+          "rtf": 0.813,
+          "bytes": 403244,
+          "path": null,
+          "status": "succeeded"
+        },
+        {
+          "wall_s": 7.591,
+          "audio_s": 9.52,
+          "rtf": 0.797,
+          "bytes": 457004,
+          "path": null,
+          "status": "succeeded"
+        }
+      ],
+      "summary": {
+        "wall_s": {
+          "median": 7.591,
+          "min": 6.832,
+          "max": 8.106
+        },
+        "audio_s": {
+          "median": 9.52,
+          "min": 8.4,
+          "max": 10.08
+        },
+        "rtf": {
+          "median": 0.804,
+          "min": 0.797,
+          "max": 0.813
+        }
+      }
+    },
+    {
+      "case": "long",
+      "chars": 211,
+      "samples": [
+        {
+          "wall_s": 15.699,
+          "audio_s": 19.52,
+          "rtf": 0.804,
+          "bytes": 937004,
+          "path": null,
+          "status": "succeeded"
+        },
+        {
+          "wall_s": 12.65,
+          "audio_s": 15.6,
+          "rtf": 0.811,
+          "bytes": 748844,
+          "path": null,
+          "status": "succeeded"
+        },
+        {
+          "wall_s": 12.888,
+          "audio_s": 15.76,
+          "rtf": 0.818,
+          "bytes": 756524,
+          "path": null,
+          "status": "succeeded"
+        }
+      ],
+      "summary": {
+        "wall_s": {
+          "median": 12.888,
+          "min": 12.65,
+          "max": 15.699
+        },
+        "audio_s": {
+          "median": 15.76,
+          "min": 15.6,
+          "max": 19.52
+        },
+        "rtf": {
+          "median": 0.811,
+          "min": 0.804,
+          "max": 0.818
+        }
+      }
+    }
+  ]
+}

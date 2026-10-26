@@ -1,9 +1,22 @@
-> **DGX Spark shared HTTP/MCP API:** see [setup, capabilities and client examples](docs/api.md).
-> Start with `uv sync --frozen --extra api` and `uv run --frozen --extra api qwen-tts-api`.
-> The API binds to `0.0.0.0` by default; configure `TTS_API_TOKENS` as shown in the guide.
-> Use `--no-auth` for token-free LAN access, or `--host 127.0.0.1` for local-only access.
-> This fork uses Python 3.13, Torch 2.10/CUDA 13 and SDPA; the upstream examples below
-> describe the original package and may use different installation defaults.
+> **DGX Spark fork:** one command starts the HTTP API and MCP server:
+>
+> ```bash
+> ./start.sh
+> ```
+>
+> It uses Python 3.13, Torch 2.10/CUDA 13, BF16 and SDPA, binding
+> `0.0.0.0:8000` with anonymous sessions by default. Set `TTS_API_TOKENS` to
+> require bearer tokens, `QWEN_TTS_AUTH=none` for token-free LAN access, or
+> `QWEN_TTS_MCP=0` to omit MCP. The 1.7B CustomVoice path measures
+> **RTF 0.74–0.80** warm on GB10; cold load adds about 37 s. See the
+> [DGX Spark guide](docs/dgx-spark.md), [performance report](docs/dgx-spark-report.md)
+> and [FlashAttention build notes](docs/flash-attention.md).
+>
+> FlashAttention has no official SM 12.1 ARM64 wheel. This fork includes a
+> source-build script for an opt-in FA2 compatibility wheel; the measured build
+> ran correctly but was **8–12% slower in RTF than SDPA**, so SDPA remains the
+> default. The [shared API guide](docs/api.md) covers the full wire contract and
+> client examples.
 
 # Qwen3-TTS
 
