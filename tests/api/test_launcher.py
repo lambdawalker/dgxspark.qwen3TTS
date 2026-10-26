@@ -26,8 +26,7 @@ def launcher(tmp_path):
     executable(commands / "uname", "echo aarch64\n")
     executable(
         commands / "uv",
-        'echo "uv $*" >> "$LAUNCH_LOG"\n'
-        'if [ "${FAIL_SYNC:-0}" = 1 ]; then exit 7; fi\n',
+        'echo "uv $*" >> "$LAUNCH_LOG"\nif [ "${FAIL_SYNC:-0}" = 1 ]; then exit 7; fi\n',
     )
     executable(venv / "python", "exit 0\n")
     executable(venv / "qwen-tts-api", 'echo "api $*" >> "$LAUNCH_LOG"\n')

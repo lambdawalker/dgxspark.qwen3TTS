@@ -18,7 +18,9 @@ jobs:
           uv venv
           uv pip sync tests/api/requirements.txt
       - name: Check launcher and build script syntax
-        run: sh -n start.sh scripts/build_flash_attn.sh
+        run: |
+          sh -n start.sh
+          sh -n scripts/build_flash_attn.sh
       - name: Test adapter and real HTTP/MCP transports
         run: .venv/bin/python -m pytest tests/api -q
       - name: Lint and formatting
