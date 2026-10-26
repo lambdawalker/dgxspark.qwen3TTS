@@ -13,7 +13,21 @@ client machine; it does not need Torch or CUDA.
 
 ## Install and launch
 
-Run on **Linux ARM64 DGX Spark, Python 3.13, CUDA 13-compatible driver**:
+Run on **Linux ARM64 DGX Spark, Python 3.13, CUDA 13-compatible driver**.
+
+The one-command path starts the HTTP API and MCP server with anonymous sessions:
+
+```bash
+./start.sh
+```
+
+It listens on `0.0.0.0:8000`, uses `.tts-data`, exposes MCP on `/mcp`, and
+creates the locked `.venv` if needed. Set `TTS_API_TOKENS` to require bearer
+tokens, `QWEN_TTS_AUTH=none` for token-free access, or `QWEN_TTS_MCP=0` to omit
+MCP. See [the DGX Spark guide](dgx-spark.md) for the measured baseline and
+[the performance report](dgx-spark-report.md).
+
+Manual token-based launch:
 
 ```bash
 uv sync --frozen --extra api
@@ -27,11 +41,15 @@ server is not a prerequisite. Use `uv` so its Git source mapping is honored;
 plain `pip install .[api]` does not apply `[tool.uv.sources]`.
 
 Default inference is `cuda:0`, `bfloat16`, **SDPA**. FlashAttention is optional and
-is not installed or assumed. Models load lazily, with only one model resident at
-a time. First inference downloads the selected immutable Hub snapshot, including
-its bundled tokenizer. Reserve disk and memory for your enabled checkpoints.
-Discovery does not load weights or require network access with the shipped pins.
-A profile marked `loadable` is not proof of successful GPU inference.
+is not installed by the lock. On GB10 it needs a local SM 12.1 build; see
+[FlashAttention on the DGX Spark](flash-attention.md). Select it with
+`QWEN_TTS_ATTENTION=flash_attention_2` after installing the wheel. The measured
+gain is workload-dependent; SDPA remains the default unless a measured comparison
+says otherwise. Models load lazily, with only one model resident at a time. First
+inference downloads the selected immutable Hub snapshot, including its bundled
+tokenizer. Reserve disk and memory for your enabled checkpoints. Discovery does
+not load weights or require network access with the shipped pins. A profile
+marked `loadable` is not proof of successful GPU inference.
 
 The default bind address is `0.0.0.0` (all IPv4 interfaces). From another machine,
 connect to `http://<spark-lan-ip>:8000`, not `0.0.0.0`. Network binding requires

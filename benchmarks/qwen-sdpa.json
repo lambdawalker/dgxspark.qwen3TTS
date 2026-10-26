@@ -1,0 +1,149 @@
+{
+  "timestamp": "2026-10-26T13:12:47.263355+00:00",
+  "url": "http://127.0.0.1:8000",
+  "model": "qwen3-tts-1.7b-customvoice",
+  "voice": "ryan",
+  "cases": [
+    {
+      "case": "short",
+      "chars": 25,
+      "samples": [
+        {
+          "wall_s": 1.8,
+          "audio_s": 2.0,
+          "rtf": 0.9,
+          "bytes": 96044,
+          "path": null,
+          "status": "succeeded"
+        },
+        {
+          "wall_s": 1.8,
+          "audio_s": 2.32,
+          "rtf": 0.776,
+          "bytes": 111404,
+          "path": null,
+          "status": "succeeded"
+        },
+        {
+          "wall_s": 2.298,
+          "audio_s": 2.88,
+          "rtf": 0.798,
+          "bytes": 138284,
+          "path": null,
+          "status": "succeeded"
+        }
+      ],
+      "summary": {
+        "wall_s": {
+          "median": 1.8,
+          "min": 1.8,
+          "max": 2.298
+        },
+        "audio_s": {
+          "median": 2.32,
+          "min": 2.0,
+          "max": 2.88
+        },
+        "rtf": {
+          "median": 0.798,
+          "min": 0.776,
+          "max": 0.9
+        }
+      }
+    },
+    {
+      "case": "medium",
+      "chars": 128,
+      "samples": [
+        {
+          "wall_s": 6.355,
+          "audio_s": 8.4,
+          "rtf": 0.756,
+          "bytes": 403244,
+          "path": null,
+          "status": "succeeded"
+        },
+        {
+          "wall_s": 6.351,
+          "audio_s": 8.48,
+          "rtf": 0.749,
+          "bytes": 407084,
+          "path": null,
+          "status": "succeeded"
+        },
+        {
+          "wall_s": 6.098,
+          "audio_s": 8.16,
+          "rtf": 0.747,
+          "bytes": 391724,
+          "path": null,
+          "status": "succeeded"
+        }
+      ],
+      "summary": {
+        "wall_s": {
+          "median": 6.351,
+          "min": 6.098,
+          "max": 6.355
+        },
+        "audio_s": {
+          "median": 8.4,
+          "min": 8.16,
+          "max": 8.48
+        },
+        "rtf": {
+          "median": 0.749,
+          "min": 0.747,
+          "max": 0.756
+        }
+      }
+    },
+    {
+      "case": "long",
+      "chars": 211,
+      "samples": [
+        {
+          "wall_s": 9.377,
+          "audio_s": 12.32,
+          "rtf": 0.761,
+          "bytes": 591404,
+          "path": null,
+          "status": "succeeded"
+        },
+        {
+          "wall_s": 9.124,
+          "audio_s": 12.32,
+          "rtf": 0.741,
+          "bytes": 591404,
+          "path": null,
+          "status": "succeeded"
+        },
+        {
+          "wall_s": 11.148,
+          "audio_s": 15.2,
+          "rtf": 0.733,
+          "bytes": 729644,
+          "path": null,
+          "status": "succeeded"
+        }
+      ],
+      "summary": {
+        "wall_s": {
+          "median": 9.377,
+          "min": 9.124,
+          "max": 11.148
+        },
+        "audio_s": {
+          "median": 12.32,
+          "min": 12.32,
+          "max": 15.2
+        },
+        "rtf": {
+          "median": 0.741,
+          "min": 0.733,
+          "max": 0.761
+        }
+      }
+    }
+  ]
+}
